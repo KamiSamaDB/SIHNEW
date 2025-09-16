@@ -32,7 +32,7 @@
 
 
         <div class="card p-4 d-flex justify-content-center align-items-center" id="station-info"
-             style="display: none; height: 100px;">
+             style="height: 100px;">
             <p class="mb-0 text-center">Next Station: VIT</p>
         </div>
     </main>
@@ -44,15 +44,19 @@
     const routeSelect = document.getElementById('route-select');
     const stationInfo = document.getElementById('station-info');
 
+    document.addEventListener('DOMContentLoaded', () => {
+        stationInfo.style.opacity = '0';
+    });
+
     // Hide station info on page load
-    stationInfo.style.display = 'none';
+    stationInfo.style.opacity = '0';
 
     // Show/hide based on valid selection
     routeSelect.addEventListener('change', function () {
         if (this.value === "") {
-            stationInfo.style.display = 'none';
+            stationInfo.style.opacity = '0';
         } else {
-            stationInfo.style.display = 'flex';
+            stationInfo.style.opacity = '1';
         }
     });
 

@@ -23,64 +23,61 @@ const sampleBuses = [
     {
         busId: "BUS1001",
         route: "Route A",
-        location: { type: "Point", coordinates: [88.3635, 22.5730] },
+        location: { type: "Point", coordinates: [79.1670, 12.9820] },
     },
     {
         busId: "BUS1002",
         route: "Route B",
-        location: { type: "Point", coordinates: [88.3650, 22.5720] },
+        location: { type: "Point", coordinates: [79.1680, 12.9830] },
     },
     {
         busId: "BUS1003",
         route: "Route C",
-        location: { type: "Point", coordinates: [88.3605, 22.5745] },
+        location: { type: "Point", coordinates: [79.1665, 12.9815] },
     },
     {
         busId: "BUS1004",
         route: "Route D",
-        location: { type: "Point", coordinates: [88.3680, 22.5715] },
+        location: { type: "Point", coordinates: [79.1690, 12.9840] },
     },
     {
         busId: "BUS1005",
         route: "Route E",
-        location: { type: "Point", coordinates: [88.3700, 22.5750] },
+        location: { type: "Point", coordinates: [79.1655, 12.9835] },
     },
 
-    // Out of 2 km range (~5 km away)
+    // Out of 2 km (~5 km away)
     {
         busId: "BUS2001",
         route: "Route F",
-        location: { type: "Point", coordinates: [88.4000, 22.5800] },
+        location: { type: "Point", coordinates: [79.2000, 12.9900] },
     },
     {
         busId: "BUS2002",
         route: "Route G",
-        location: { type: "Point", coordinates: [88.4100, 22.5650] },
+        location: { type: "Point", coordinates: [79.2100, 12.9750] },
     },
     {
         busId: "BUS2003",
         route: "Route H",
-        location: { type: "Point", coordinates: [88.3950, 22.5900] },
+        location: { type: "Point", coordinates: [79.1950, 12.9700] },
     },
-
-    // Edge case (~2 km away)
     {
-        busId: "BUS3001",
+        busId: "BUS2004",
         route: "Route I",
-        location: { type: "Point", coordinates: [88.3850, 22.5700] },
+        location: { type: "Point", coordinates: [79.2050, 12.9850] },
     },
     {
-        busId: "BUS3002",
+        busId: "BUS2005",
         route: "Route J",
-        location: { type: "Point", coordinates: [88.3600, 22.5600] },
+        location: { type: "Point", coordinates: [79.2150, 12.9650] },
     },
 ];
-
 
 // --- 3. Connect + Insert ---
 const run = async () => {
     try {
-        await mongoose.connect("", {
+        await mongoose.connect("mongodb+srv://kanchen:RT0rfEpU0AginKjC@cluster0.vrfugok.mongodb.net/sih2025?retryWrites=true&w=majority&appName=Cluster0", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Bus Tracker - MitrYaan</title>
+
+    <!-- Bootstrap & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .tracker-container {
+            width: 60%;
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .eta-text {
+            margin-top: 15px;
+            font-weight: 500;
+            color: #f0f0f0;
+        }
+
+        .lite-mode-container {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-check-label {
+            color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tracker-container">
+        <h2 class="h4 mb-3">Bus Tracking</h2>
+
+        <!-- Map -->
+        <div id="map"></div>
+
+        <!-- ETA -->
+        <p class="eta-text" id="eta-text">Estimated Time to Reach: calculating...</p>
+
+        <!-- Lite Mode Toggle -->
+        <div class="lite-mode-container form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="lite-mode-toggle">
+            <label class="form-check-label" for="lite-mode-toggle">Lite Mode</label>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Get user coordinates from localStorage
+        const userLat = parseFloat(localStorage.getItem('userLat'));
+        const userLng = parseFloat(localStorage.getItem('userLng'));
+        const userCoords = [userLat, userLng];
+
+        // Get busId from localStorage
+        const busId = localStorage.getItem('busId');
+
+        if (!userLat || !userLng || !busId) {
+            alert("Missing user location or bus ID. Please go back and select a route.");
+            window.location.href = "index.html";
+        }
+
+        let map, routingControl, busMarker;
+
+        function initMap(busCoords) {
+            map = L.map("map").setView(userCoords, 14);
+
+            const busIcon = L.icon({
+                iconUrl: './assets/img/bus.png', // bus icon
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40]
+            });
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: "&copy; OpenStreetMap contributors",
+            }).addTo(map);
+
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(userCoords[0], userCoords[1]),
+                    L.latLng(busCoords[0], busCoords[1])
+                ],
+                routeWhileDragging: false,
+                lineOptions: {
+                    styles: [{ color: 'green', opacity: 0.7, weight: 5 }]
+                },
+                createMarker: function (i, wp) {
+                    if (i === 0) {
+                        return L.marker(wp.latLng).bindPopup("You");
+                    } else {
+                        busMarker = L.marker(wp.latLng, { icon: busIcon }).bindPopup("Bus");
+                        return busMarker;
+                    }
+                },
+                addWaypoints: false,
+                show: false,
+                draggableWaypoints: false,
+                showAlternatives: false
+            }).addTo(map);
+
+            routingControl.on('routesfound', function (e) {
+                const routes = e.routes;
+                if (routes && routes.length > 0) {
+                    const summary = routes[0].summary;
+                    const durationMinutes = Math.round(summary.totalTime / 60);
+                    document.getElementById('eta-text').textContent =
+                        `Estimated Time to Reach: ${durationMinutes} minutes`;
+                }
+            });
+
+            // Lite mode toggle
+            const toggle = document.getElementById('lite-mode-toggle');
+            const mapDiv = document.getElementById('map');
+            toggle.addEventListener('change', function () {
+                mapDiv.style.display = this.checked ? 'none' : 'block';
+            });
+        }
+
+        // Fetch initial bus coordinates
+        fetch(`http://localhost:3000/bus/${busId}`)
+            .then(res => res.json())
+            .then(bus => {
+                if (!bus || !bus.location || !bus.location.coordinates) {
+                    throw new Error("Bus location not found");
+                }
+
+                const busCoords = [bus.location.coordinates[1], bus.location.coordinates[0]];
+                initMap(busCoords);
+
+                // --- Socket.IO live updates ---
+                const socket = io("http://localhost:3000");
+
+                socket.on("connect", () => {
+                    console.log("Connected to server with socket id:", socket.id);
+                });
+
+                socket.on("disconnect", () => {
+                    console.log("Disconnected from server");
+                });
+
+                socket.on(`bus-${busId}`, ({ lat, lng }) => {
+                    console.log(`Bus ${busId} current location: ${lat}, ${lng}`);
+
+                    if (busMarker) {
+                        busMarker.setLatLng([lat, lng]);
+                    }
+
+                    routingControl.setWaypoints([
+                        L.latLng(userCoords[0], userCoords[1]),
+                        L.latLng(lat, lng)
+                    ]);
+                    const bounds = L.latLngBounds([userCoords, [lat, lng]]);
+                    map.fitBounds(bounds, { padding: [50, 50] }); // add padding so they're not at edges
+                });
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to fetch bus location.");
+            });
+    </script>
+</body>
+
+</html>

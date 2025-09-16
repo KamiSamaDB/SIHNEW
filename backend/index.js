@@ -4,6 +4,7 @@ import http from "http";
 import { Server } from "socket.io";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -13,7 +14,7 @@ const PORT = 3000;
 // Middleware
 app.use(express.json());
 app.use(morgan("dev"));
-
+app.use(cors());
 // --- MongoDB Connection ---
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,

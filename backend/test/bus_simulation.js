@@ -4,17 +4,17 @@ import { io } from "socket.io-client";
 const socket = io("http://localhost:3000");
 
 // Bus info
-const busId = "BUS101";
+const busId = "BUS1004";
 
 // Starting location (Kolkata example)
-let lat = 22.5726;
-let lng = 88.3639;
+let lat = 12.984;
+let lng = 79.169;
 
 // Function to simulate small movements
 function moveBus() {
   // Random small movement
-  lat += (Math.random() - 0.5) * 0.001; // ~100m max
-  lng += (Math.random() - 0.5) * 0.001;
+  lat += (Math.random() - 0.5) * 0.003; // ~100m max
+  lng += (Math.random() - 0.5) * 0.003;
 
   // Emit location to server
   socket.emit("busLocationUpdate", { busId, lat, lng });

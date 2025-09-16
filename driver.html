@@ -43,6 +43,26 @@
 <script>
     const routeSelect = document.getElementById('route-select');
     const stationInfo = document.getElementById('station-info');
+    let coords = null;
+
+    function trackLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            coords = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            console.log("Current Location:", coords);
+            },
+          (error) => {
+            alert("Unable to retrieve location: " + error.message);
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
         stationInfo.style.opacity = '0';
@@ -53,6 +73,7 @@
 
     // Show/hide based on valid selection
     routeSelect.addEventListener('change', function () {
+        trackLocation();
         if (this.value === "") {
             stationInfo.style.opacity = '0';
         } else {
@@ -64,7 +85,7 @@
         // Store the next page URL
         sessionStorage.setItem('nextPage', originalHref);
         // Navigate to loading page
-        window.location.href = 'loading.html';
+        window.coords.href = 'loading.html';
     }
 
     // Add onclick handler to all navigation links
@@ -73,7 +94,7 @@
         link.addEventListener('click', function (e) {
             e.preventDefault();
             sessionStorage.setItem('nextPage', originalHref);
-            window.location.href = 'loading.html';
+            window.coords.href = 'loading.html';
         });
     });
 </script>

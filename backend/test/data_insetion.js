@@ -77,7 +77,7 @@ const sampleBuses = [
 // --- 3. Connect + Insert ---
 const run = async () => {
     try {
-        await mongoose.connect("mongodb+srv://kanchen:RT0rfEpU0AginKjC@cluster0.vrfugok.mongodb.net/sih2025?retryWrites=true&w=majority&appName=Cluster0", {
+        await mongoose.connect("", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

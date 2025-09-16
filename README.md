@@ -1,6 +1,7 @@
 # MitrYaan 🚌
 
 
+
 **Real-time public transport tracking for India's emerging cities, powered by the community.**
 
 ---
@@ -49,11 +50,19 @@ Our platform uses a simple Progressive Web App (PWA) on the bus conductor's phon
 
 ---
 
-🏛️ System Architecture
-Our architecture is a lightweight, real-time system designed for efficiency. The data flows in three simple steps:
+## 🏛️ System Architecture
 
-1) Transmit: The Driver's App captures GPS coordinates and sends them to our backend API.
+The user flow for a commuter is designed to be simple and intuitive.
 
-2) Process: The Backend API validates the data and instantly updates the bus's location in our Firebase Realtime Database.
-
-3) Receive: The Commuter's App listens for live updates from Firebase, which pushes the new location directly to the user's map for a smooth, real-time experience.
+```mermaid
+graph LR;
+    A(Start) --> B[User opens MitrYaan PWA];
+    B --> C[User selects 'Commuter' Role];
+    C --> D["User enters destination (e.g., 'Fort')"];
+    D --> E{Is Destination Valid?};
+    E -- Yes --> F[Backend fetches all routes serving the destination];
+    E -- No --> D;
+    F --> G["App displays available routes (e.g., Route 10A, 2B)"];
+    G --> H["User selects a route (e.g., 10A)"];
+    H --> I[App displays real-time bus location on map];
+    I --> J(End);

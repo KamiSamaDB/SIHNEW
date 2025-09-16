@@ -2,268 +2,214 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Find Your Bus - MitrYaan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="style.css" rel="stylesheet"/>
 </head>
 
 <body>
-    <div class="container py-4">
-        <header class="card mb-4 p-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="back-btn">&larr;</a>
-                <img src="logo.png" alt="MitrYaan Logo" height="80">
-                <h1 class="h3 mb-0" id="header-title">Find Your Bus</h1>
+<div class="container py-4">
+    <header class="card mb-4 p-3">
+        <div class="d-flex align-items-center gap-3">
+            <a class="back-btn" href="index.html" id="back-button">&larr;</a>
+            <img alt="MitrYaan Logo" height="80" src="logo.png"/>
+            <h1 class="h3 mb-0" id="header-title">Find Your Bus</h1>
+        </div>
+    </header>
+
+    <main>
+        <!-- Destination Search View -->
+        <div class="view active" id="destination-search-view">
+            <div class="card p-4">
+                <h2 class="h4 mb-4">Where do you want to go?</h2>
+                <div class="mb-3">
+                    <label class="form-label" for="destination-input">Enter your destination</label>
+                    <input class="form-control" id="destination-input" placeholder="e.g., Vellore Fort, VIT"
+                           type="text"/>
+                </div>
+                <button class="btn btn-primary" id="find-bus-btn">Find Bus</button>
             </div>
-        </header>
+        </div>
 
-        <main>
-            <div id="destination-search-view" class="view active">
-                <div class="card p-4">
-                    <h2 class="h4 mb-4">Where do you want to go?</h2>
-                    <div class="mb-3">
-                        <label for="destination-input" class="form-label">Enter your destination</label>
-                        <input type="text" class="form-control" id="destination-input"
-                            placeholder="e.g., Vellore Fort, VIT">
-                    </div>
-                    <button id="find-bus-btn" class="btn btn-primary">Find Bus</button>
-                </div>
+        <!-- Route Results View -->
+        <div class="view" id="route-results-view">
+            <h2 class="h4 mb-4">Available Routes</h2>
+            <div class="list-group">
+                <button class="card p-3 mb-2 text-start route-result-card" data-route="10A">
+                    <h3 class="h5 mb-1">Route 10A</h3>
+                    <p class="mb-0 text-secondary">From: CMC Hospital To: Vellore Fort</p>
+                </button>
+                <button class="card p-3 mb-2 text-start route-result-card" data-route="2B">
+                    <h3 class="h5 mb-1">Route 2B</h3>
+                    <p class="mb-0 text-secondary">From: Old Bus Stand To: Vellore Fort</p>
+                </button>
             </div>
+        </div>
 
-            <div id="route-results-view" class="view">
-                <h2 class="h4 mb-4">Available Routes</h2>
-                <div class="list-group">
-                    <button class="card p-3 mb-2 text-start route-result-card" data-route="10A">
-                        <h3 class="h5 mb-1">Route 10A</h3>
-                        <p class="mb-0 text-secondary">From: CMC Hospital To: Vellore Fort</p>
-                    </button>
-                    <button class="card p-3 mb-2 text-start route-result-card" data-route="2B">
-                        <h3 class="h5 mb-1">Route 2B</h3>
-                        <p class="mb-0 text-secondary">From: Old Bus Stand To: Vellore Fort</p>
-                    </button>
-                </div>
-            </div>
-
-            <div id="bus-tracking-view" class="view">
-                <div class="card p-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 id="selected-route-text" class="h5 mb-0">Bus for </h3>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="lite-mode-toggle">
-                            <label class="form-check-label" for="lite-mode-toggle">Lite Mode</label>
-                        </div>
+        <!-- Bus Tracking View -->
+        <div class="view" id="bus-tracking-view">
+            <div class="card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="h5 mb-0" id="selected-route-text">Bus for </h3>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="lite-mode-toggle" type="checkbox"/>
+                        <label class="form-check-label" for="lite-mode-toggle">Lite Mode</label>
                     </div>
-                </div>
-
-                <div id="map-view">
-                    <div class="card p-4 text-center map-container">
-                        Map will be displayed here.
-                    </div>
-                </div>
-
-                <div id="lite-view" class="card p-4" style="display: none;">
-                    <p class="mb-2"><strong>Status:</strong> Bus is approaching Central Market.</p>
-                    <p class="mb-2"><strong>Next Stop:</strong> City Hospital</p>
-                    <p class="mb-0"><strong>ETA:</strong> 6 minutes</p>
-                </div>
-
-                <div id="feedback-initial" class="feedback-box">
-                    <p class="mb-3">Are you in this bus?</p>
-                    <div class="d-flex gap-2 justify-content-center">
-                        <button class="btn btn-primary" id="yes-in-bus">Yes</button>
-                        <button class="btn btn-outline-primary" id="no-in-bus">No</button>
-                    </div>
-                </div>
-
-                <div id="feedback-confirm" class="feedback-box" style="display: none;">
-                    <p class="mb-3">Is this info correct?</p>
-                    <div class="d-flex gap-2 justify-content-center">
-                        <button class="btn btn-primary" id="yes-correct">Yes</button>
-                        <button class="btn btn-outline-primary" id="no-correct">No</button>
-                    </div>
-                </div>
-
-                <div id="feedback-thanks" class="feedback-box" style="display: none;">
-                    <p class="mb-0">Thank you for your feedback!</p>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ...existing JavaScript code... -->
-    <script>
-        // --- Simple JS for UI navigation simulation ---
-        const views = document.querySelectorAll('.view');
-        const headerTitle = document.getElementById('header-title');
-        const backButton = document.getElementById('back-button');
+            <div id="map-view">
+                <div class="card p-4 text-center map-container">
+                    Map will be displayed here.
+                </div>
+            </div>
 
-        const findBusBtn = document.getElementById('find-bus-btn');
-        const routeResultCards = document.querySelectorAll('.route-result-card');
-        const toggle = document.getElementById('lite-mode-toggle');
-        const mapView = document.getElementById('map-view');
-        const liteView = document.getElementById('lite-view');
+            <div class="card p-4" id="lite-view" style="display: none;">
+                <p class="mb-2"><strong>Status:</strong> Bus is approaching Central Market.</p>
+                <p class="mb-2"><strong>Next Stop:</strong> City Hospital</p>
+                <p class="mb-0"><strong>ETA:</strong> 6 minutes</p>
+            </div>
 
-        // Add this to your existing script section
-        const feedbackInitial = document.getElementById('feedback-initial');
-        const feedbackConfirm = document.getElementById('feedback-confirm');
-        const feedbackThanks = document.getElementById('feedback-thanks');
+            <div class="feedback-box" id="feedback-initial">
+                <p class="mb-3">Are you in this bus?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-primary" id="yes-in-bus">Yes</button>
+                    <button class="btn btn-outline-primary" id="no-in-bus">No</button>
+                </div>
+            </div>
 
-        document.getElementById('yes-in-bus').addEventListener('click', () => {
-            feedbackInitial.style.display = 'none';
-            feedbackConfirm.style.display = 'block';
+            <div class="feedback-box" id="feedback-confirm" style="display: none;">
+                <p class="mb-3">Is this info correct?</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-primary" id="yes-correct">Yes</button>
+                    <button class="btn btn-outline-primary" id="no-correct">No</button>
+                </div>
+            </div>
+
+            <div class="feedback-box" id="feedback-thanks" style="display: none;">
+                <p class="mb-0">Thank you for your feedback!</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript Code -->
+<script>
+    const views = document.querySelectorAll('.view');
+    const headerTitle = document.getElementById('header-title');
+    const backButton = document.getElementById('back-button');
+    const findBusBtn = document.getElementById('find-bus-btn');
+    const routeResultCards = document.querySelectorAll('.route-result-card');
+    const toggle = document.getElementById('lite-mode-toggle');
+    const mapView = document.getElementById('map-view');
+    const liteView = document.getElementById('lite-view');
+    const feedbackInitial = document.getElementById('feedback-initial');
+    const feedbackConfirm = document.getElementById('feedback-confirm');
+    const feedbackThanks = document.getElementById('feedback-thanks');
+
+    // Navigation between views
+    function showView(viewId) {
+        views.forEach(view => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        updateHeader(viewId);
+    }
+
+    // Update header title and back button
+    function updateHeader(viewId) {
+        if (viewId === 'destination-search-view') {
+            headerTitle.textContent = 'Find Your Bus';
+            backButton.href = 'index.html';
+            backButton.onclick = null;
+        } else if (viewId === 'route-results-view') {
+            headerTitle.textContent = 'Available Routes';
+            backButton.href = '#';
+            backButton.onclick = () => showView('destination-search-view');
+        } else if (viewId === 'bus-tracking-view') {
+            const selectedRoute = document.querySelector('.route-result-card.selected')?.dataset.route || '';
+            headerTitle.textContent = `Tracking Route ${selectedRoute}`;
+            backButton.href = '#';
+            backButton.onclick = () => showView('route-results-view');
+        }
+    }
+
+    // Handle Find Bus button
+    findBusBtn.addEventListener('click', () => {
+        showView('route-results-view');
+    });
+
+    // Handle route selection
+    routeResultCards.forEach(card => {
+        card.addEventListener('click', () => {
+            routeResultCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            const routeText = card.querySelector('h3').textContent;
+            document.getElementById('selected-route-text').textContent = `Bus for ${routeText}`;
+            showView('bus-tracking-view');
         });
+    });
 
-        document.getElementById('no-in-bus').addEventListener('click', () => {
-            feedbackInitial.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-        });
+    // Lite mode toggle
+    toggle.addEventListener('change', function () {
+        if (this.checked) {
+            mapView.style.display = 'none';
+            liteView.style.display = 'block';
+        } else {
+            mapView.style.display = 'block';
+            liteView.style.display = 'none';
+        }
+    });
 
-        document.getElementById('yes-correct').addEventListener('click', () => {
-            feedbackConfirm.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-        });
+    // Feedback buttons
+    document.getElementById('yes-in-bus').addEventListener('click', () => {
+        feedbackInitial.style.display = 'none';
+        feedbackConfirm.style.display = 'block';
+    });
 
-        document.getElementById('no-correct').addEventListener('click', () => {
-            feedbackConfirm.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-        });
+    document.getElementById('no-in-bus').addEventListener('click', () => {
+        feedbackInitial.style.display = 'none';
+        feedbackThanks.style.display = 'block';
+        hideThanks();
+    });
 
-        // After 3 seconds of showing thanks, hide it
-        function hideThanks() {
-            const thanksFeedback = document.getElementById('feedback-thanks');
+    document.getElementById('yes-correct').addEventListener('click', () => {
+        feedbackConfirm.style.display = 'none';
+        feedbackThanks.style.display = 'block';
+        hideThanks();
+    });
+
+    document.getElementById('no-correct').addEventListener('click', () => {
+        feedbackConfirm.style.display = 'none';
+        feedbackThanks.style.display = 'block';
+        hideThanks();
+    });
+
+    // Hide thank you message after some time
+    function hideThanks() {
+        setTimeout(() => {
+            feedbackThanks.classList.add('fade-out');
             setTimeout(() => {
-                thanksFeedback.classList.add('fade-out');
-                setTimeout(() => {
-                    thanksFeedback.style.display = 'none';
-                    thanksFeedback.classList.remove('fade-out');
-                }, 500); // Match this with animation duration (0.5s = 500ms)
-            }, 3000);
-        }
+                feedbackThanks.style.display = 'none';
+                feedbackThanks.classList.remove('fade-out');
+            }, 500);
+        }, 3000);
+    }
 
-        document.getElementById('yes-correct').addEventListener('click', () => {
-            feedbackConfirm.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-            hideThanks();
-        });
-
-        document.getElementById('no-correct').addEventListener('click', () => {
-            feedbackConfirm.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-            hideThanks();
-        });
-
-        document.getElementById('no-in-bus').addEventListener('click', () => {
-            feedbackInitial.style.display = 'none';
-            feedbackThanks.style.display = 'block';
-            hideThanks();
-        });
-
-        // Function to switch between views
-        function showView(viewId) {
-            views.forEach(view => view.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            updateHeader(viewId);
-        }
-
-        // Function to update header text and back button behavior
-        function updateHeader(viewId) {
-            if (viewId === 'destination-search-view') {
-                headerTitle.textContent = 'Find Your Bus';
-                backButton.href = 'index.html'; // Go back to role selection
-            } else if (viewId === 'route-results-view') {
-                headerTitle.textContent = 'Available Routes';
-                backButton.onclick = () => showView('destination-search-view');
-                backButton.href = '#';
-            } else if (viewId === 'bus-tracking-view') {
-                // Example of setting a dynamic title
-                const selectedRoute = document.querySelector('.route-result-card.selected')?.dataset.route || '';
-                headerTitle.textContent = `Tracking Route ${selectedRoute}`;
-                backButton.onclick = () => showView('route-results-view');
-                backButton.href = '#';
-            }
-        }
-
-        // Event Listener for the "Find Bus" button
-        findBusBtn.addEventListener('click', () => {
-            // In a real app, you would fetch data here
-            // For the demo, we just switch to the results view
-            showView('route-results-view');
-        });
-
-        // Event Listeners for each route card
-        routeResultCards.forEach(card => {
-            card.addEventListener('click', () => {
-                // Remove 'selected' from any other card
-                routeResultCards.forEach(c => c.classList.remove('selected'));
-                // Add 'selected' to the clicked card to know which one was chosen
-                const routeText = card.querySelector('h3').textContent;
-                // Update the tracking view header
-                document.getElementById('selected-route-text').textContent = `Bus for ${routeText}`;
-                card.classList.add('selected');
-                showView('bus-tracking-view');
-            });
-        });
-
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                mapView.style.display = 'none';
-                liteView.style.display = 'block';
-            } else {
-                mapView.style.display = 'block';
-                liteView.style.display = 'none';
-            }
-        });
-
-        function showView(viewId) {
-            views.forEach(view => view.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            updateHeader(viewId);
-        }
-
-        // Event Listeners for each route card
-        routeResultCards.forEach(card => {
-            card.addEventListener('click', () => {
-                routeResultCards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                showView('bus-tracking-view');
-            });
-        });
-
-
-
-        toggle.addEventListener('change', function () {
-            if (this.checked) {
-                mapView.style.display = 'none';
-                liteView.style.display = 'block';
-            } else {
-                mapView.style.display = 'block';
-                liteView.style.display = 'none';
-            }
-        });
-
-        function showLoading() {
-            // Store the next page URL
+    // Navigation links interception (for loading page logic)
+    document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
+        const originalHref = link.getAttribute('href');
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
             sessionStorage.setItem('nextPage', originalHref);
-
-            // Navigate to loading page
             window.location.href = 'loading.html';
-        }
-
-        // Add onclick handler to all navigation links
-        document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
-            const originalHref = link.getAttribute('href');
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                sessionStorage.setItem('nextPage', originalHref);
-                window.location.href = 'loading.html';
-            });
         });
-
-    </script>
+    });
+</script>
 </body>
 
 </html>

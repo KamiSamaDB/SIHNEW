@@ -2,77 +2,77 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Driver Dashboard - MitrYaan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="style.css" rel="stylesheet"/>
 </head>
 
 <body>
-    <div class="container py-4">
-        <header class="card mb-4 p-3">
-            <div class="d-flex align-items-center gap-3">
-                <a href="index.html" class="back-btn">&larr;</a>
-                <img src="logo.png" alt="MitrYaan Logo" height="80">
-                <h1 class="h3 mb-0">Track Your Bus</h1>
-            </div>
-        </header>
+<div class="container py-4">
+    <header class="card mb-4 p-3">
+        <div class="d-flex align-items-center gap-3">
+            <a class="back-btn" href="index.html">&larr;</a>
+            <img alt="MitrYaan Logo" height="80" src="logo.png"/>
+            <h1 class="h3 mb-0">Track Your Bus</h1>
+        </div>
+    </header>
 
-        <main>
-            <div class="card p-4 mb-4">
-                <div class="mb-3">
-                    <label for="route-select" class="form-label">Select your route</label>
-                    <select class="form-select" id="route-select">
-                        <option value="">--Select a bus route--</option>
-                        <option value="5B">Route 5B</option>
-                        <option value="10A">Route 10A</option>
-                        <option value="21G">Route 21G</option>
-                    </select>
-                </div>
-            </div>
+    <main>
+        <div class="card p-4 mb-4">
+            <select class="form-select" id="route-select">
+                <option disabled selected value="">--Select a bus route--</option>
+                <option value="5B">Route 5B</option>
+                <option value="10A">Route 10A</option>
+                <option value="21G">Route 21G</option>
+            </select>
+        </div>
 
-            <div id="station-info" class="card p-4" style="display: none;">
-                <p class="mb-0">Next Station: VIT</p>
-            </div>
-        </main>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ...existing JavaScript code... -->
+        <div class="card p-4 d-flex justify-content-center align-items-center" id="station-info"
+             style="display: none; height: 100px;">
+            <p class="mb-0 text-center">Next Station: VIT</p>
+        </div>
+    </main>
+</div>
 
-    <script>
-        const routeSelect = document.getElementById('route-select');
-        const stationInfo = document.getElementById('station-info');
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        routeSelect.addEventListener('change', function () {
-            if (this.value === '') {
-                stationInfo.style.display = 'none';
-            } else {
-                stationInfo.style.display = 'block';
-            }
-        });
+<script>
+    const routeSelect = document.getElementById('route-select');
+    const stationInfo = document.getElementById('station-info');
 
-        function showLoading() {
-            // Store the next page URL
-            sessionStorage.setItem('nextPage', originalHref);
+    // Hide station info on page load
+    stationInfo.style.display = 'none';
 
-            // Navigate to loading page
-            window.location.href = 'loading.html';
+    // Show/hide based on valid selection
+    routeSelect.addEventListener('change', function () {
+        if (this.value === "") {
+            stationInfo.style.display = 'none';
+        } else {
+            stationInfo.style.display = 'flex';
         }
+    });
 
-        // Add onclick handler to all navigation links
-        document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
-            const originalHref = link.getAttribute('href');
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                sessionStorage.setItem('nextPage', originalHref);
-                window.location.href = 'loading.html';
-            });
+    function showLoading() {
+        // Store the next page URL
+        sessionStorage.setItem('nextPage', originalHref);
+        // Navigate to loading page
+        window.location.href = 'loading.html';
+    }
+
+    // Add onclick handler to all navigation links
+    document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
+        const originalHref = link.getAttribute('href');
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            sessionStorage.setItem('nextPage', originalHref);
+            window.location.href = 'loading.html';
         });
-
-    </script>
+    });
+</script>
 </body>
 
 </html>

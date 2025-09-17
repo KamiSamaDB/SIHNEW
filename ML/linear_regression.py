@@ -25,5 +25,3 @@ pred_time_at_8km = m * distance_to_predict + b
 
 # arrival time
 arrival_time = start_time + timedelta(minutes=pred_time_at_8km)
-
-print(f"Expected arrival: {arrival_time.strftime('%Y-%m-%d %H:%M:%S')}")

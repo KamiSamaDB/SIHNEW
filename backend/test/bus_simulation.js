@@ -1,19 +1,18 @@
 import { io } from "socket.io-client";
 
-// Connect to your backend
+
 const socket = io("http://localhost:3000");
 
-// Bus info
-const busId = "BUS1004";
 
-// Starting location (Kolkata example)
+const busId = "BUS2002";
+
 let lat = 12.984;
 let lng = 79.169;
 
-// Function to simulate small movements
+
 function moveBus() {
   // Random small movement
-  lat += (Math.random() - 0.5) * 0.003; // ~100m max
+  lat += (Math.random() - 0.5) * 0.003; 
   lng += (Math.random() - 0.5) * 0.003;
 
   // Emit location to server

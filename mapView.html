@@ -58,8 +58,10 @@
             color: #f0f0f0;
         }
 
-        td{
-            color: #2d2d2d;
+        .bus-info {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #bbb;
         }
     </style>
 </head>
@@ -79,6 +81,11 @@
             <input class="form-check-input" type="checkbox" id="lite-mode-toggle">
             <label class="form-check-label" for="lite-mode-toggle">Lite Mode</label>
         </div>
+
+        <!-- ✅ Bus Info -->
+        <div class="bus-info" id="bus-info">
+            Loading bus details...
+        </div>
     </div>
 
     <!-- Leaflet JS -->
@@ -94,7 +101,8 @@
         const userLat = parseFloat(localStorage.getItem('userLat'));
         const userLng = parseFloat(localStorage.getItem('userLng'));
         const userCoords = [userLat, userLng];
-
+        console.log('User cords : ',userCoords);
+        
         // Get busId from localStorage
         const busId = localStorage.getItem('busId');
 
@@ -160,13 +168,17 @@
             });
         }
 
-        // Fetch initial bus coordinates
+        // Fetch bus details (including route)
         fetch(`http://localhost:3000/bus/${busId}`)
             .then(res => res.json())
             .then(bus => {
                 if (!bus || !bus.location || !bus.location.coordinates) {
                     throw new Error("Bus location not found");
                 }
+
+                // ✅ Show bus info at bottom
+                const busInfoDiv = document.getElementById('bus-info');
+                busInfoDiv.textContent = `Bus ID: ${bus.busId} | Route: ${bus.route}`;
 
                 const busCoords = [bus.location.coordinates[1], bus.location.coordinates[0]];
                 initMap(busCoords);
@@ -194,7 +206,7 @@
                         L.latLng(lat, lng)
                     ]);
                     const bounds = L.latLngBounds([userCoords, [lat, lng]]);
-                    map.fitBounds(bounds, { padding: [50, 50] }); // add padding so they're not at edges
+                    map.fitBounds(bounds, { padding: [50, 50] }); // keep both in frame
                 });
             })
             .catch(err => {

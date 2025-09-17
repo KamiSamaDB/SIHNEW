@@ -2,102 +2,141 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Driver Dashboard - MitrYaan</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
-    <link href="style.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="style.css" rel="stylesheet" />
 </head>
 
 <body>
-<div class="container py-4">
-    <header class="card mb-4 p-3">
-        <div class="d-flex align-items-center gap-3">
-            <a class="back-btn" href="index.html">&larr;</a>
-            <img alt="MitrYaan Logo" height="80" src="logo.png"/>
-            <h1 class="h3 mb-0">Track Your Bus</h1>
-        </div>
-    </header>
+    <div class="container py-4">
+        <header class="card mb-4 p-3">
+            <div class="d-flex align-items-center gap-3">
+                <a class="back-btn" href="index.html">&larr;</a>
+                <img alt="MitrYaan Logo" height="80" src="logo.png" />
+                <h1 class="h3 mb-0">Track Your Bus</h1>
+            </div>
+        </header>
 
-    <main>
-        <div class="card p-4 mb-4">
-            <select class="form-select" id="route-select">
-                <option disabled selected value="">--Select a bus route--</option>
-                <option value="5B">Route 5B</option>
-                <option value="10A">Route 10A</option>
-                <option value="21G">Route 21G</option>
-            </select>
-        </div>
+        <main>
+            <div class="card p-4 mb-4">
+                <select class="form-select" id="route-select">
+                    <option disabled selected value="">--Select a bus route--</option>
+                </select>
+            </div>
 
+            <div class="card p-4 d-flex justify-content-center align-items-center" id="station-info"
+                style="height: 100px;">
+                <p class="mb-0 text-center">Next Station: VIT</p>
+            </div>
+        </main>
+    </div>
 
-        <div class="card p-4 d-flex justify-content-center align-items-center" id="station-info"
-             style="height: 100px;">
-            <p class="mb-0 text-center">Next Station: VIT</p>
-        </div>
-    </main>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ Socket.IO client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const routeSelect = document.getElementById('route-select');
+        const stationInfo = document.getElementById('station-info');
+        let coords = null;
+        let busId = null;
+        let socket = null;
+        let locationInterval = null;
 
-<script>
-    const routeSelect = document.getElementById('route-select');
-    const stationInfo = document.getElementById('station-info');
-    let coords = null;
+        // --- Fetch available buses dynamically ---
+        async function loadBuses() {
+            try {
+                const res = await fetch('http://localhost:3000/buses');
+                const buses = await res.json();
 
-    function trackLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            coords = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            };
-            console.log("Current Location:", coords);
-            },
-          (error) => {
-            alert("Unable to retrieve location: " + error.message);
-          }
-        );
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
+                routeSelect.innerHTML = '<option disabled selected value="">--Select a bus route--</option>';
 
-    document.addEventListener('DOMContentLoaded', () => {
-        stationInfo.style.opacity = '0';
-    });
+                buses.forEach(bus => {
+                    const opt = document.createElement('option');
+                    opt.value = bus.busId;
+                    opt.textContent = `${bus.route} (${bus.busId})`;
+                    routeSelect.appendChild(opt);
+                });
 
-    // Hide station info on page load
-    stationInfo.style.opacity = '0';
-
-    // Show/hide based on valid selection
-    routeSelect.addEventListener('change', function () {
-        trackLocation();
-        if (this.value === "") {
-            stationInfo.style.opacity = '0';
-        } else {
-            stationInfo.style.opacity = '1';
+            } catch (err) {
+                console.error('Error fetching buses:', err);
+                alert('Failed to load available buses.');
+            }
         }
-    });
 
-    function showLoading() {
-        // Store the next page URL
-        sessionStorage.setItem('nextPage', originalHref);
-        // Navigate to loading page
-        window.coords.href = 'loading.html';
-    }
+        // Get driver (browser) location
+        function trackLocationAndEmit() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        coords = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
 
-    // Add onclick handler to all navigation links
-    document.querySelectorAll('a[href]:not([href^="#"])').forEach(link => {
-        const originalHref = link.getAttribute('href');
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            sessionStorage.setItem('nextPage', originalHref);
-            window.location.href = 'loading.html';
+                        console.log("Current Location:", coords);
+
+                        // Send to server via socket
+                        if (socket && busId) {
+                            socket.emit("busLocationUpdate", {
+                                busId,
+                                lat: coords.latitude,
+                                lng: coords.longitude
+                            });
+                            console.log(`Sent location: ${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)} for id ${busId}`);
+                        }
+                    },
+                    (error) => {
+                        console.warn("Unable to retrieve location:", error.message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            stationInfo.style.opacity = '0';
+            loadBuses();
         });
-    });
-</script>
+
+        // Show/hide based on valid selection
+        routeSelect.addEventListener('change', function () {
+            if (this.value === "") {
+                stationInfo.style.opacity = '0';
+                return;
+            }
+
+            // Store busId
+            busId = this.value;
+            localStorage.setItem('busId', busId);
+
+            stationInfo.style.opacity = '1';
+
+            // --- Setup Socket.IO connection ---
+            if (!socket) {
+                socket = io("http://localhost:3000");
+
+                socket.on("connect", () => {
+                    console.log("Connected to server with socket id:", socket.id);
+                });
+
+                socket.on("disconnect", () => {
+                    console.log("Disconnected from server");
+                });
+            }
+
+            // Clear old interval if already running
+            if (locationInterval) clearInterval(locationInterval);
+
+            // Start sending location every 5s
+            trackLocationAndEmit(); // send immediately
+            locationInterval = setInterval(trackLocationAndEmit, 5000);
+        });
+    </script>
 </body>
 
 </html>
